@@ -1,0 +1,47 @@
+Bootstrap: docker
+From: rocker/r-ver:latest
+
+%files
+./cmdstan_make_local /opt
+
+%post
+cd /opt
+
+apt update
+apt install -y curl
+apt install -y git
+apt install -y openmpi-bin
+apt install -y libopenmpi-dev
+apt install -y libglpk40
+apt install -y libxt6
+rm -rf /var/lib/apt/lists/*
+
+git clone --branch v2.33.1 --depth 1 --recurse-submodules --shallow-submodules https://github.com/stan-dev/cmdstan.git
+cd cmdstan
+mv ../cmdstan_make_local make/local
+make build
+chmod a+w /opt/cmdstan/stan/src/stan/model
+
+export CMDSTAN=/opt/cmdstan
+
+install2.r --error --skipinstalled lme4 brms dplyr
+Rscript -e 'install.packages("cmdstanr", repos = c("https://mc-stan.org/r-packages/", getOption("repos")))'
+rm -rf /tmp/downloaded_packages
+
+echo "#!/bin/bash" > /usr/local/bin/entrypoint
+echo "export PATH=\$PATH:\$CMDSTAN/bin" >> /usr/local/bin/entrypoint
+echo 'exec Rscript "$@"' >> /usr/local/bin/entrypoint
+chmod a+x /usr/local/bin/entrypoint
+
+mkdir -p /home/work
+
+%environment
+export CMDSTAN=/opt/cmdstan
+
+%runscript
+cd /home/work
+exec entrypoint "$@"
+
+%startscript
+cd /home/work
+exec entrypoint "$@"
