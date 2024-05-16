@@ -1,8 +1,8 @@
 This project allows a user to create a container for Rscipt with the CmdStanR library, and use that container in batch jobs launched by the Slurm scheduler and executed on the Expanse cluster at SDSC. The batch script assumes the use of Singularity, but a container definition for Docker is also included. The batch script has a line near the top
  
-#SBATCH -A <<project>>
+#SBATCH -A <project>
  
-that designates the project that will be charged for a job run using this script. You’ll need to replace the <<project>> part with the appropriate project code. Another couple of lines near the top
+that designates the project that will be charged for a job run using this script. You’ll need to replace the <project> part with the appropriate project code. Another couple of lines near the top
  
 #SBATCH --ntasks-per-node=16
 #SBATCH --mem=32G
@@ -17,6 +17,6 @@ squeue -u $USER
  
 Any output from the job can be found in the directory
  
-/expanse/lustre/scratch/$USER/temp_project/job-<<job ID>>
+/expanse/lustre/scratch/$USER/temp_project/job-<job ID>
  
-where <<job ID>> is the numeric identity assigned to the job by the scheduler.
+where <job ID> is the numeric identity assigned to the job by the scheduler.
